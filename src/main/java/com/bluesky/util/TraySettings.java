@@ -29,12 +29,10 @@ public class TraySettings {
             itemDisplay.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (flag) {
+                    if (jFrame.isVisible()) {
                         jFrame.setVisible(false);
-                        flag = false;
                     } else {
                         jFrame.setVisible(true);
-                        flag = true;
                     }
                 }
             });
@@ -49,7 +47,7 @@ public class TraySettings {
             popupMenu.add(itemExit);
 //            System.out.println(getClass().getClassLoader().getResource("image/resizeApi12.png"));
             //创建托盘图标
-            ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource("image/TrayIcon.ico"));
+            ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource("image/resizeApi.png"));
             // 创建图片对象
             TrayIcon trayIcon = new TrayIcon(icon.getImage(), "Scan Upload",
                     popupMenu);

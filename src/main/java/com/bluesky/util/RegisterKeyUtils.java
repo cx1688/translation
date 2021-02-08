@@ -31,4 +31,7 @@ public class RegisterKeyUtils {
             }
         });
     }
+    public void registerKeys(String keys,HotKeyListener hotKeyListener){
+        provider.register(KeyStroke.getKeyStroke(keys),hotKeyListener);
+    }
 }

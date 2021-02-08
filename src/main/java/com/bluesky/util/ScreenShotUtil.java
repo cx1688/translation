@@ -1,31 +1,37 @@
+package com.bluesky.util;
+
+import com.bluesky.interfaces.impl.TaskThree;
+import com.bluesky.windows.MainApp;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 public class ScreenShotUtil extends JFrame {
-    private static final ScreenShotUtil INSTANCE = new ScreenShotUtil();
+//    private static final ScreenShotUtil INSTANCE = new ScreenShotUtil();
     private BufferedImage image, tempImg, saveImage;
-    private ToolWindows toolWindows;
+    private ImageWindows imageWindows;
     private int orgY, orgX, endX, endY;
 
+    private MainApp mainApp;
 
-    private ScreenShotUtil() {
-
+    public ScreenShotUtil(MainApp mainApp) {
+        this.mainApp = mainApp;
     }
 
-    public static final ScreenShotUtil getINSTANCE() {
-        return INSTANCE;
-    }
+//    public static final ScreenShotUtil getINSTANCE() {
+//        return INSTANCE;
+//    }
 
-    public static void main(String[] args) throws IOException, UnsupportedFlavorException {
-        ScreenShotUtil screenShotUtil = ScreenShotUtil.getINSTANCE();
-        screenShotUtil.init();
-    }
 
     @Override
     public void paint(Graphics g) {
@@ -35,6 +41,7 @@ public class ScreenShotUtil extends JFrame {
     }
 
     public void init() {
+
         try {
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
             this.setBounds(0, 0, d.width, d.height);
@@ -65,20 +72,20 @@ public class ScreenShotUtil extends JFrame {
             public void mousePressed(MouseEvent e) {
                 orgX = e.getX();
                 orgY = e.getY();
-                if (toolWindows != null) {
-                    toolWindows.setVisible(false);
+                if (imageWindows != null) {
+                    imageWindows.setVisible(false);
                 }
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (toolWindows == null) {
-                    toolWindows = new ToolWindows(ScreenShotUtil.this, e.getX(), e.getY());
+                if (imageWindows == null) {
+                    imageWindows = new ImageWindows(ScreenShotUtil.this, e.getX(), e.getY());
                 } else {
-                    toolWindows.setLocation(e.getX(), e.getY());
+                    imageWindows.setLocation(e.getX(), e.getY());
                 }
-                toolWindows.setVisible(true);
-                toolWindows.toFront();
+                imageWindows.setVisible(true);
+                imageWindows.toFront();
                 ScreenShotUtil.this.setVisible(false);
             }
         });
@@ -88,6 +95,7 @@ public class ScreenShotUtil extends JFrame {
                 endX = e.getX();
                 endY = e.getY();
                 Image image2 = createImage(ScreenShotUtil.this.getWidth(), ScreenShotUtil.this.getHeight());
+
                 Graphics g = image2.getGraphics();
                 g.drawImage(tempImg, 0, 0, null);
                 int x = Math.min(orgX, endX);
@@ -116,38 +124,86 @@ public class ScreenShotUtil extends JFrame {
     public void setSaveImage(BufferedImage saveImage) {
         this.saveImage = saveImage;
     }
+
+    public MainApp getMainApp() {
+        return mainApp;
+    }
+
+    public void setMainApp(MainApp mainApp) {
+        this.mainApp = mainApp;
+    }
 }
 
 
-class ToolWindows extends JFrame {
-    private ScreenShotUtil screenShotUtil;
+class ImageWindows extends JFrame {
+    private final ScreenShotUtil screenShotUtil;
     private BufferedImage image;
-    public ToolWindows(ScreenShotUtil screenShotUtil, int x, int y) {
+    private JFrame jFrame;
+
+    public ImageWindows(ScreenShotUtil screenShotUtil, int x, int y) {
         this.screenShotUtil = screenShotUtil;
         this.init();
         this.pack();
-        this.setVisible(true);
+
 
     }
 
     private void init() {
         this.setLayout(new CardLayout());
+//        this.setVisible(true);
+
+//        this.setBounds(0,0,640,480);
         JLabel imageLabel = new JLabel();
         this.image = screenShotUtil.getSaveImage();
+        JPanel jPanel = new JPanel();
         int width = image.getWidth();
-        int height =image.getHeight();
-        imageLabel.setBounds(0,20,width,height);
+        int height = image.getHeight();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int centerX = screenSize.width / 2 - width / 2;
+        int centerY = screenSize.height / 2 - height / 2;
+        imageLabel.setBounds(0, 0, width, height);
         imageLabel.setIcon(new ImageIcon(image));
-        this.setBounds(0,0,width,height+20);
-        this.setLocationRelativeTo(null);
+        jPanel.setBounds(0, 0, width + 1, height + 1);
+        jPanel.add(imageLabel);
+        this.setBounds(0, 0, width, height);
+//        this.setLocationRelativeTo(null);
         this.setAlwaysOnTop(true);
-        JToolBar toolBar = new JToolBar("Java 截图");
+        this.setBounds(centerX, centerY, jPanel.getWidth() + 2, image.getHeight());
+        this.add(jPanel);
+
+        this.setResizable(false);
+        this.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
+        this.setUndecorated(true);
+        new ToolBarDto().init(screenShotUtil, this, image);
+    }
+//    @Override
+//    public void paint(Graphics g) {
+//        g.drawImage(image, 0, 0, this);
+//    }
+}
+
+class ToolBarDto extends JWindow {
+
+    public void init(ScreenShotUtil screenShotUtil, ImageWindows imageWindows, BufferedImage image) {
+        this.setLayout(new CardLayout());
+        this.setBounds(imageWindows.getX(), imageWindows.getY() - 50, 200, 33);
+        this.setVisible(true);
+        JToolBar toolBar = new JToolBar("截图工具");
         //保存按钮
         JButton saveButton = new JButton("保存");
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                if (image != null) {
+                    try {
+                        FileOutputStream fileOutputStream = new FileOutputStream(new File(LocalDateTime.now() + ".png"));
+                        ImageIO.write(image, "png", fileOutputStream);
+                        imageWindows.dispose();
+                        ToolBarDto.this.dispose();
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
+                }
             }
         });
         toolBar.add(saveButton);
@@ -155,11 +211,18 @@ class ToolWindows extends JFrame {
         JButton literacy = new JButton("识字");
 
 
-
         literacy.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                try {
+                    ImageIO.write(image, "png", bos);
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+                new TaskThree(bos.toByteArray(), screenShotUtil.getMainApp()).execute();
+                imageWindows.dispose();
+                ToolBarDto.this.dispose();
             }
         });
         toolBar.add(literacy);
@@ -177,20 +240,14 @@ class ToolWindows extends JFrame {
         cancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ToolWindows.this.dispose();
+                imageWindows.dispose();
                 screenShotUtil.setVisible(true);
             }
         });
         toolBar.add(cancel);
-        toolBar.setVisible(true);
-        this.add(imageLabel);
+//                this.setLocationRelativeTo(null);
+//        toolBar.setBounds(0,jPanel.getHeight(),jPanel.getWidth(),30);
+//        this.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
         this.add(toolBar);
-
     }
-//    @Override
-//    public void paint(Graphics g) {
-//        g.drawImage(image, 0, 0, this);
-//    }
 }
-
-
