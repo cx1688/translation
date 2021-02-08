@@ -224,7 +224,7 @@ public class MainApp extends JFrame {
             }
         });
         setTitle("领航员号翻译工具");
-
+        setResizable(false);
         try {
             setIconImage(ImageIO.read(this.getClass().getClassLoader().getResource("image/resizeApi.png")));
         } catch (IOException e) {

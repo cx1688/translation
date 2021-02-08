@@ -1,0 +1,5 @@
+#!/bin/bash
+JRE_LOCAL_PATH=./jre/bin/java
+PID=$(ps -ef | grep fanyi_project-1.0-SNAPSHOT.jar | grep -v "grep" | awk '{print $2}')
+kill -9 $PID
+$JRE_LOCAL_PATH -jar ./fanyi_project-1.0-SNAPSHOT.jar
