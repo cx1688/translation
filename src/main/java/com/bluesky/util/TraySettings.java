@@ -1,14 +1,18 @@
 package com.bluesky.util;
 
-import com.bluesky.windows.MainApp;
-
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Arrays;
 
 public class TraySettings {
     private static final TraySettings INSTANCE = new TraySettings();
+    boolean flag = true;
 
     private TraySettings() {
     }
@@ -16,7 +20,7 @@ public class TraySettings {
     public static TraySettings getINSTANCE() {
         return INSTANCE;
     }
-    boolean flag =true;
+
     public void systemTray(JFrame jFrame) {
         if (SystemTray.isSupported()) { // 判断系统是否支持托盘功能.
             // 创建托盘右击弹出菜单
@@ -48,7 +52,14 @@ public class TraySettings {
 //            System.out.println(getClass().getClassLoader().getResource("image/resizeApi12.png"));
             //创建托盘图标
 //            ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource("image/resizeApi.png"));
-            Image image = Toolkit.getDefaultToolkit().getImage("image/resizeApi.png");
+            URL url = this.getClass().getClassLoader().getResource("image/resizeApi.png");
+            BufferedImage image = null;
+            try {
+                image = ImageIO.read(url);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+//            Image image = Toolkit.getDefaultToolkit().getImage(read.get);
             // 创建图片对象
             TrayIcon trayIcon = new TrayIcon(image, "这是我的托盘程序",
                     popupMenu);
@@ -62,7 +73,6 @@ public class TraySettings {
                 }
 
             });
-
             //把托盘图标添加到系统托盘
             //这个可以点击关闭之后再放到托盘里面，在此是打开程序直接显示托盘图标了
             try {
