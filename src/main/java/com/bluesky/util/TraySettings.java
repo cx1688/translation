@@ -47,9 +47,10 @@ public class TraySettings {
             popupMenu.add(itemExit);
 //            System.out.println(getClass().getClassLoader().getResource("image/resizeApi12.png"));
             //创建托盘图标
-            ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource("image/resizeApi.png"));
+//            ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource("image/resizeApi.png"));
+            Image image = Toolkit.getDefaultToolkit().getImage("image/resizeApi.png");
             // 创建图片对象
-            TrayIcon trayIcon = new TrayIcon(icon.getImage(), "Scan Upload",
+            TrayIcon trayIcon = new TrayIcon(image, "这是我的托盘程序",
                     popupMenu);
 
             //这句话很重要，不然托盘图标不显示！！！

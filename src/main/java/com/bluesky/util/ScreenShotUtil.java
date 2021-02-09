@@ -6,7 +6,6 @@ import com.bluesky.windows.MainApp;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
@@ -17,7 +16,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 public class ScreenShotUtil extends JFrame {
-//    private static final ScreenShotUtil INSTANCE = new ScreenShotUtil();
+    //    private static final ScreenShotUtil INSTANCE = new ScreenShotUtil();
     private BufferedImage image, tempImg, saveImage;
     private ImageWindows imageWindows;
     private int orgY, orgX, endX, endY;
