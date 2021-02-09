@@ -7,3 +7,5 @@
 ```shell
 mvn assembly:assembly
 ```
+
+所有接口都来源于网络，图片识别接口不是太完美，有些字体无法识别。
